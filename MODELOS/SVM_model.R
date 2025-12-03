@@ -88,35 +88,37 @@ test_predictions <- predict(
   type = "class"
 )
 
-# ------------------------------------
-# Cálculo de Métricas (usando yardstick)
-# ------------------------------------
+# ------------------------------------>
+# Cálculo de Métricas (usando caret)
+# ------------------------------------>
 
-# Crear la matriz de confusión
-conf_mat_result <- confusionMatrix(
+# Crear la matriz de confusión (genera todas las estadísticas)
+cm <- confusionMatrix(
   data = test_predictions, 
-  reference = test_data_scaled$label # <-- USAR LA ETIQUETA DEL DATO ESCALADO
+  reference = test_data_scaled$label, # <-- USAR LA ETIQUETA DEL DATO ESCALADO
+  mode = "everything"                 # Forzar el cálculo de todas las estadísticas
 )
 
-# Cálculo de la Precisión (Accuracy)
-acc <- test_predictions %>% 
-  accuracy(truth = label, estimate = .pred_class) %>% 
-  pull(.estimate)
+# -------------------------------------------------------------------
+# Extracción de Métricas directamente desde el objeto 'cm' de caret
+# -------------------------------------------------------------------
 
-# Cálculo de Métricas Multiclase (Precision, Recall, F1-Score)
-class_metrics <- conf_mat_result %>% 
-  summary() %>%
-  filter(.metric %in% c("precision", "recall", "f_meas")) %>%
-  filter(.estimator == "macro") # Usar macro para promediar las métricas por clase
+# Nota: El objeto 'cm' de caret ya contiene las métricas macro/promedio.
 
-# Consolidar los resultados en un data frame
 model_results <- data.frame(
-  Model = "Decision Tree (rpart)",
-  Accuracy = acc,
-  Precision = class_metrics %>% filter(.metric == "precision") %>% pull(.estimate),
-  Recall = class_metrics %>% filter(.metric == "recall") %>% pull(.estimate),
-  F1_Score = class_metrics %>% filter(.metric == "f_meas") %>% pull(.estimate)
+  Model = "SVM (radial)",
+  
+  # Extracción de la exactitud global
+  Accuracy = cm$overall['Accuracy'], 
+  
+  # Extracción de las métricas promedio por clase (Mean_Precision, Mean_Recall, Mean_F1)
+  # Estas métricas NO siempre están disponibles directamente en cm$byClass
+  # La forma más segura es calcular el promedio de la columna respectiva:
+  Precision = mean(cm$byClass[, "Precision"], na.rm = TRUE),
+  Recall = mean(cm$byClass[, "Recall"], na.rm = TRUE),
+  F1_Score = mean(cm$byClass[, "F1"], na.rm = TRUE)
 )
+
 print(model_results)
 
 
