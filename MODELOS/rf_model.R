@@ -73,19 +73,19 @@ message("Modelo Random Forest entrenado con éxito.")
 # 1. Realizar predicciones sobre el conjunto de prueba
 test_predictions <- predict(
   rf_model, 
-  newdata = testData, 
+  newdata = test_data, 
   type = "class" 
 )
 
 # 2. ASEGURAR NIVELES IDÉNTICOS (Corrección del error NA)
 # Forzamos que los niveles del factor predicho sean los mismos que los reales.
-levels(test_predictions) <- levels(testData$label)
+levels(test_predictions) <- levels(test_data$label)
 
 
 # 3. Crear la matriz de confusión, forzando el cálculo de todas las estadísticas
 cm <- confusionMatrix(
   data = test_predictions,          # Predicciones con niveles corregidos
-  reference = testData$label,       # Etiquetas reales
+  reference = test_data$label,       # Etiquetas reales
   mode = "everything" 
 )
 
