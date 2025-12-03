@@ -8,6 +8,7 @@
 # 1. Carga de Librerías y Carga de Datos
 # ----------------------------------------------------
 # Nota: Asegúrate de tener instalados los paquetes: install.packages(c("data.table", "tidymodels"))
+library(dplyr)
 library(data.table)
 library(tidymodels)
 library(tidyverse) 
@@ -19,6 +20,12 @@ set.seed(42)
 
 # Cargar el dataset
 data <- read.csv("C:/Users/USUARIO/Desktop/AC_Digit_Recognition/digit-recognizer/train.csv")
+
+# Crea subset
+data <- data %>%
+  group_by(label) %>%
+  slice_sample(prop = 10000 / nrow(data)) %>%
+  ungroup()
 
 # ----------------------------------------------------
 # 2. Preparación de Datos y División
