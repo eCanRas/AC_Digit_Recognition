@@ -18,8 +18,8 @@ library(rpart.plot)
 set.seed(42)
 
 # Cargar el dataset
-data <- read.csv("C:/Users/USUARIO/Desktop/AC_Digit_Recognition/digit-recognizer/train.csv")
-
+#data <- read.csv("C:/Users/USUARIO/Desktop/AC_Digit_Recognition/digit-recognizer/train.csv")
+data <- read.csv("~/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/digit-recognizer/train.csv")
 # Crea subset
 data <- data %>%
   group_by(label) %>%
@@ -44,92 +44,135 @@ train_data <- training(data_split)
 test_data <- testing(data_split)
 
 
-# ----------------------------------------------------
-# 3. Definición de la Receta (Preprocesamiento)
-# ----------------------------------------------------
-# Para un Árbol de Decisión básico, no es estrictamente necesaria la normalización
-# o estandarización, pero la incluimos para consistencia en el flujo de trabajo 
-# si decides usar un modelo sensible al escalado después.
-
-digit_recipe <- 
-  recipe(label ~ ., data = train_data) %>%
-  # Se estandarizan las variables numéricas
-  step_normalize(all_numeric_predictors()) %>%
-  # Eliminar variables que tienen varianza cero (ruido)
-  step_zv(all_predictors())
-
 
 # ----------------------------------------------------
-# 4. Definición, Especificación y Entrenamiento del Modelo (PARTE A CAMBIAR)
+# 3. Entrenamiento del Modelo rpart
 # ----------------------------------------------------
 
-# Definición del Modelo (Árbol de Decisión)
-# set_engine("rpart") usa el paquete rpart, que es el motor de árbol por defecto
-model_spec <- 
-  decision_tree(
-    cost_complexity = 0.001, # Parámetro de poda (ajustable)
-    tree_depth = 10,         # Profundidad máxima del árbol (ajustable)
-    mode = "classification"
-  ) %>%
-  set_engine("rpart") 
-# [Image of a simple decision tree diagram]
+control <- rpart.control(
+  minsplit = 20,
+  minbucket = 7,
+  cp = 0.001,
+  maxdepth = 15,
+  xval = 5         
+)
 
 
-# Creación del Workflow (Combina Receta y Modelo)
-digit_wflow <- 
-  workflow() %>%
-  add_recipe(digit_recipe) %>%
-  add_model(model_spec)
-
-# Entrenamiento del Modelo
-# Esto aplica la receta (paso 3) y entrena el modelo (paso 4)
-model_fit <- fit(digit_wflow, data = train_data)
-
+arbol <- rpart(
+  label ~ .,
+  data = train_data,
+  method = "class",
+  control = control
+)
 # ----------------------------------------------------
-# 5. Evaluación y Extracción de Métricas
+# 4.1. Evaluación y Métricas - Árbol sin podar
 # ----------------------------------------------------
 
-# Generar predicciones sobre el conjunto de prueba
-test_predictions <- 
-  predict(model_fit, new_data = test_data) %>% 
-  bind_cols(test_data %>% select(label)) # Añadir las etiquetas reales
+predicciones_no_podado <- predict(arbol, newdata = test_data, type = "class")
 
-# ------------------------------------
-# Cálculo de Métricas (usando yardstick)
-# ------------------------------------
+test_predictions_no_podado <-
+  tibble(.pred_class = predicciones_no_podado) %>%
+  bind_cols(test_data %>% select(label))
 
-# Crear la matriz de confusión
-conf_mat_result <- conf_mat(test_predictions, truth = label, estimate = .pred_class)
-print(conf_mat_result)
+conf_mat_result_no_podado <- conf_mat(test_predictions_no_podado,
+                                      truth = label,
+                                      estimate = .pred_class)
+print(conf_mat_result_no_podado)
 
-# Cálculo de la Precisión (Accuracy)
-acc <- test_predictions %>% 
-  accuracy(truth = label, estimate = .pred_class) %>% 
+acc_no_podado <- test_predictions_no_podado %>%
+  accuracy(truth = label, estimate = .pred_class) %>%
   pull(.estimate)
 
-# Cálculo de Métricas Multiclase (Precision, Recall, F1-Score)
-class_metrics <- conf_mat_result %>% 
+class_metrics_no_podado <- conf_mat_result_no_podado %>%
   summary() %>%
-  filter(.metric %in% c("precision", "recall", "f_meas")) %>%
-  filter(.estimator == "macro") # Usar macro para promediar las métricas por clase
+  filter(.metric %in% c("precision", "recall", "f_meas"),
+         .estimator == "macro")
 
-# Consolidar los resultados en un data frame
-model_results <- data.frame(
-  Model = "Decision Tree (rpart)",
-  Accuracy = acc,
-  Precision = class_metrics %>% filter(.metric == "precision") %>% pull(.estimate),
-  Recall = class_metrics %>% filter(.metric == "recall") %>% pull(.estimate),
-  F1_Score = class_metrics %>% filter(.metric == "f_meas") %>% pull(.estimate)
+precision_no_podado <- class_metrics_no_podado %>%
+  filter(.metric == "precision") %>%
+  pull(.estimate)
+
+recall_no_podado <- class_metrics_no_podado %>%
+  filter(.metric == "recall") %>%
+  pull(.estimate)
+
+f1_no_podado <- class_metrics_no_podado %>%
+  filter(.metric == "f_meas") %>%
+  pull(.estimate)
+
+# ----------------------------------------------------
+# 4.2. Poda por mínimo xerror y métricas - Árbol podado
+# ----------------------------------------------------
+
+print(arbol$cptable)
+
+opt    <- which.min(arbol$cptable[, "xerror"])
+cp_opt <- arbol$cptable[opt, "CP"]
+
+arbol_podado <- prune(arbol, cp = cp_opt)
+
+predicciones_podado <- predict(arbol_podado, newdata = test_data, type = "class")
+
+test_predictions_podado <-
+  tibble(.pred_class = predicciones_podado) %>%
+  bind_cols(test_data %>% select(label))
+
+conf_mat_result_podado <- conf_mat(test_predictions_podado,
+                                   truth = label,
+                                   estimate = .pred_class)
+print(conf_mat_result_podado)
+
+acc_podado <- test_predictions_podado %>%
+  accuracy(truth = label, estimate = .pred_class) %>%
+  pull(.estimate)
+
+class_metrics_podado <- conf_mat_result_podado %>%
+  summary() %>%
+  filter(.metric %in% c("precision", "recall", "f_meas"),
+         .estimator == "macro")
+
+precision_podado <- class_metrics_podado %>%
+  filter(.metric == "precision") %>%
+  pull(.estimate)
+
+recall_podado <- class_metrics_podado %>%
+  filter(.metric == "recall") %>%
+  pull(.estimate)
+
+f1_podado <- class_metrics_podado %>%
+  filter(.metric == "f_meas") %>%
+  pull(.estimate)
+
+
+# ----------------------------------------------------
+# 5c. Consolidar los resultados en un data frame
+# ----------------------------------------------------
+
+model_results <- rbind(
+  data.frame(
+    Model     = "Decision Tree (rpart) - podado",
+    Accuracy  = acc_no_podado,
+    Precision = precision_no_podado,
+    Recall    = recall_no_podado,
+    F1_Score  = f1_no_podado,
+  ),
+  data.frame(
+    Model     = "Decision Tree (rpart) - (min xerror)",
+    Accuracy  = acc_podado,
+    Precision = precision_podado,
+    Recall    = recall_podado,
+    F1_Score  = f1_podado,
+  )
 )
-print(model_results)
 
+print(model_results)
 
 # ----------------------------------------------------
 # 6. Guardar Resultados
 # ----------------------------------------------------
 
-results_path <- "C:/Users/USUARIO/Desktop/AC_Digit_Recognition/Resultados/metrics_summary.csv"
-
+#results_path <- "C:/Users/USUARIO/Desktop/AC_Digit_Recognition/Resultados/metrics_summary.csv"
+results_path <- "C:/Users/maria/Documents/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/Resultados/metrics_summary.csv"
 # Leer, adjuntar y escribir los resultados
 if (file.exists(results_path)) {
   existing_results <- fread(results_path)

@@ -18,7 +18,7 @@ library(e1071)
 set.seed(42)
 
 # Cargar el dataset
-data <- read.csv("C:/Users/USUARIO/Desktop/AC_Digit_Recognition/digit-recognizer/train.csv")
+data <- read.csv("digit-recognizer/train.csv")
 
 # Crea subset
 data <- data %>%
