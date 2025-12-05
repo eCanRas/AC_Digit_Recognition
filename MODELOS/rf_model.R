@@ -19,7 +19,8 @@ library(randomForest)
 set.seed(42)
 
 # Cargar el dataset
-data <- read.csv("C:/Users/USUARIO/Desktop/AC_Digit_Recognition/digit-recognizer/train.csv")
+#data <- read.csv("C:/Users/USUARIO/Desktop/AC_Digit_Recognition/digit-recognizer/train.csv")
+data <- read.csv("~/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/digit-recognizer/train_importance.csv")
 
 # Crea subset
 data <- data %>%
@@ -89,26 +90,41 @@ cm <- confusionMatrix(
   mode = "everything" 
 )
 
-# 4. Extracción de Métricas (sin cambios)
+# 4. Extracción de Métricas (macro-promedio por clase)
+
+# Matriz de métricas por clase
+by_class <- cm$byClass
+
+# Precision (Pos Pred Value) y Recall (Sensitivity) por clase
+precision_class <- by_class[ , "Pos Pred Value"]
+recall_class    <- by_class[ , "Sensitivity"]
+
+# F1 por clase
+f1_class <- 2 * precision_class * recall_class / (precision_class + recall_class)
+
+# Promedios macro (ignorando posibles NA)
+mean_precision <- mean(precision_class, na.rm = TRUE)
+mean_recall    <- mean(recall_class,    na.rm = TRUE)
+mean_f1        <- mean(f1_class,        na.rm = TRUE)
+
 model_results <- data.frame(
-  Model = "Random Forest (randomForest)",
-  
-  # Extracción de la exactitud global
-  Accuracy = cm$overall['Accuracy'], 
-  
-  # Extracción de las métricas promedio por clase
-  Precision = cm$byClass['Mean_Precision'],
-  Recall = cm$byClass['Mean_Recall'],
-  F1_Score = cm$byClass['Mean_F1']
+  Model     = "Random Forest (randomForest)",
+  Accuracy  = cm$overall["Accuracy"],  # exactitud global
+  Precision = mean_precision,          # macro-precision
+  Recall    = mean_recall,             # macro-recall
+  F1_Score  = mean_f1                  # macro-F1
 )
+
 print(model_results)
+
 
 
 # ----------------------------------------------------
 # 5. Guardar Resultados
 # ----------------------------------------------------
 
-results_path <- "C:/Users/USUARIO/Desktop/AC_Digit_Recognition/Resultados/metrics_summary.csv"
+#results_path <- "C:/Users/USUARIO/Desktop/AC_Digit_Recognition/Resultados/metrics_summary.csv"
+results_path <- "C:/Users/maria/Documents/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/Resultados/importance_metrics_summary.csv"
 
 # Leer, adjuntar y escribir los resultados
 if (file.exists(results_path)) {

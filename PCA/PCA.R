@@ -3,8 +3,12 @@ library(factoextra)
 # ==============================================================================
 # 1. CARGA DE DATOS
 # ==============================================================================
-train <- read.csv("train.csv")
-test <- read.csv("test.csv")
+#train <- read.csv("train.csv")
+#test <- read.csv("test.csv")
+
+train <- read.csv("~/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/digit-recognizer/train.csv")
+test <- read.csv("~/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/digit-recognizer/test.csv")
+
 
 # Separamos la etiqueta del train (columna 1) para no meterla en el cálculo matemático
 train_label <- train[, 1]

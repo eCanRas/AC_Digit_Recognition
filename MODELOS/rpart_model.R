@@ -19,7 +19,10 @@ set.seed(42)
 
 # Cargar el dataset
 #data <- read.csv("C:/Users/USUARIO/Desktop/AC_Digit_Recognition/digit-recognizer/train.csv")
-data <- read.csv("~/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/digit-recognizer/train.csv")
+#data <- read.csv("~/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/digit-recognizer/train.csv")
+#data <- read.csv("~/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/digit-recognizer/train_importance.csv")
+data <- read.csv("~/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/digit-recognizer/train_pca.csv")
+
 # Crea subset
 data <- data %>%
   group_by(label) %>%
@@ -104,12 +107,28 @@ f1_no_podado <- class_metrics_no_podado %>%
 # 4.2. Poda por mínimo xerror y métricas - Árbol podado
 # ----------------------------------------------------
 
-print(arbol$cptable)
+# Índice del mínimo xerror
+min_row <- which.min(arbol$cptable[, "xerror"])
 
-opt    <- which.min(arbol$cptable[, "xerror"])
-cp_opt <- arbol$cptable[opt, "CP"]
+# Valor mínimo de xerror y su desviación estándar
+min_xerror <- arbol$cptable[min_row, "xerror"]
+min_xstd   <- arbol$cptable[min_row, "xstd"]
+
+# Umbral 1-SE: mínimo xerror + 1 * xstd
+one_se_limit <- min_xerror + min_xstd
+
+# Filas cuyo xerror está por debajo del umbral
+cpt <- arbol$cptable
+candidates <- which(cpt[, "xerror"] <= one_se_limit)
+
+# Elegimos el árbol MÁS SIMPLE entre los que cumplen (nsplit más pequeño)
+# suele ser el primero en 'candidates'
+best_row <- tail(candidates, 1)
+
+cp_opt <- cpt[best_row, "CP"]
 
 arbol_podado <- prune(arbol, cp = cp_opt)
+
 
 predicciones_podado <- predict(arbol_podado, newdata = test_data, type = "class")
 
@@ -150,18 +169,18 @@ f1_podado <- class_metrics_podado %>%
 
 model_results <- rbind(
   data.frame(
-    Model     = "Decision Tree (rpart) - podado",
+    Model     = "Decision Tree (rpart) - no podado",
     Accuracy  = acc_no_podado,
     Precision = precision_no_podado,
     Recall    = recall_no_podado,
-    F1_Score  = f1_no_podado,
+    F1_Score  = f1_no_podado
   ),
   data.frame(
     Model     = "Decision Tree (rpart) - (min xerror)",
     Accuracy  = acc_podado,
     Precision = precision_podado,
     Recall    = recall_podado,
-    F1_Score  = f1_podado,
+    F1_Score  = f1_podado
   )
 )
 
@@ -172,7 +191,7 @@ print(model_results)
 # ----------------------------------------------------
 
 #results_path <- "C:/Users/USUARIO/Desktop/AC_Digit_Recognition/Resultados/metrics_summary.csv"
-results_path <- "C:/Users/maria/Documents/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/Resultados/metrics_summary.csv"
+results_path <- "C:/Users/maria/Documents/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/Resultados/pca_metrics_summary.csv"
 # Leer, adjuntar y escribir los resultados
 if (file.exists(results_path)) {
   existing_results <- fread(results_path)
