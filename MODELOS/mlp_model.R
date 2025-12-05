@@ -20,7 +20,8 @@ library(nnet) # Paquete que implementa el método 'nnet' (MLP/Red Neuronal)
 set.seed(42)
 
 # Cargar el dataset (Asegúrate de que la ruta sea correcta)
-data <- read.csv("C:/Users/USUARIO/Desktop/AC_Digit_Recognition/digit-recognizer/train.csv")
+#data <- read.csv("C:/Users/USUARIO/Desktop/AC_Digit_Recognition/digit-recognizer/train.csv")
+data <- read.csv("~/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/digit-recognizer/train_pca.csv")
 
 # Crea subset
 data <- data %>%
@@ -66,8 +67,8 @@ message("Iniciando ajuste de hiperparámetros para el MLP (Red Neuronal). Esto t
 # --- Definición de la Búsqueda de Rejilla ---
 # 'size' (número de neuronas en la capa oculta) y 'decay' (regularización de peso)
 mlp_grid <- expand.grid(
-  size = c(5, 10, 15),       # Número de neuronas a probar
-  decay = c(0.001, 0.01, 0.1) # Regularización L2 (peso) a probar
+  size = c(5, 10),       # Número de neuronas a probar
+  decay = c(0.01, 0.1) # Regularización L2 (peso) a probar
 )
 
 # --- Definición del Control de Entrenamiento (Cross-Validation) ---
@@ -86,7 +87,9 @@ mlp_model <- train(
   trControl = fit_control,
   tuneGrid = mlp_grid,          # Usar la rejilla definida
   linout = FALSE,               # Falso para clasificación
-  trace = FALSE                 # Suprime mensajes de nnet
+  trace = FALSE,                 # Suprime mensajes de nnet
+  MaxNWts = 20000   # <<--- aumentar límite de pesos
+  
 )
 
 message("Ajuste de hiperparámetros finalizado.")
@@ -95,7 +98,6 @@ message("Mejores hiperparámetros encontrados:")
 print(mlp_model$bestTune)
 
 
-[Image of a diagram illustrating a Multilayer Perceptron (MLP) structure with an input layer, one hidden layer (showing 'size' number of neurons), and an output layer (showing 10 neurons for the 10 classes)]
 
 
 # ----------------------------------------------------
@@ -134,7 +136,7 @@ print(model_results)
 # 5. Guardar Resultados
 # ----------------------------------------------------
 
-results_path <- "C:/Users/USUARIO/Desktop/AC_Digit_Recognition/Resultados/metrics_summary.csv"
+results_path <- "C:/Users/maria/Documents/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/Resultados/pca_metrics_summary.csv"
 
 # Leer, adjuntar y escribir los resultados
 if (file.exists(results_path)) {
