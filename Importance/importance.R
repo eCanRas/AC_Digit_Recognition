@@ -10,7 +10,7 @@ test <- read.csv("digit-recognizer/test.csv")
 # PASO 1: CALCULAR LA IMPORTANCIA
 # ==============================================================================
 # Para cumplir el objetivo de "bajo consumo de recursos", no usamos todo el dataset
-# para calcular la importancia, sino una muestra representativa (ej. 10.000 filas).
+# para calcular la importancia, sino una muestra representativa (ej. 5.000 filas).
 set.seed(123)
 muestra_filas <- sample(1:nrow(train), 5000)
 train_sample <- train[muestra_filas, ]
@@ -48,10 +48,10 @@ plot(var_imp_df$Importance,
      type = "l", 
      main = "Caída de Importancia de Variables", 
      xlab = "Número de Variables (Píxeles)", 
-     ylab = "Importancia (Impurity)",
+     ylab = "Importancia",
      col = "blue", lwd = 2)
 
-# Dibujamos una línea en 250 para ver dónde cae
+# Dibujamos una línea en 125 para ver dónde cae
 abline(v = 125, col = "red", lty = 2)
 
 ###################################
@@ -62,7 +62,7 @@ abline(v = 125, col = "red", lty = 2)
 # PASO 2: SELECCIÓN Y REDUCCIÓN
 # ==============================================================================
 # Decidimos quedarnos con las mejores N variables.
-# Nos quedamos con 300 variables, que explicarían aproximadamente el 85-90% del dataset
+# Nos quedamos con 125 variables, que explicarían aproximadamente el 85-90% del dataset
 top_n <- 125 
 mejores_variables <- as.character(var_imp_df$Variable[1:top_n])
 
