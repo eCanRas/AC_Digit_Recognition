@@ -139,3 +139,6 @@ fwrite(combined_results, results_path)
 
 message("Resultados guardados en: ", results_path)
 
+# (modelo, scaler, datos de entrenamiento, parámetros)
+save(svm_model, scaler, train_data_scaled, test_data_scaled, file = "svm_kernel_importance.RData")
+message("Modelo completo guardado en: svm_kernel_importance.RData")
