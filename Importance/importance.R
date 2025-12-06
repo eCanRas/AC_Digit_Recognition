@@ -52,7 +52,7 @@ plot(var_imp_df$Importance,
      col = "blue", lwd = 2)
 
 # Dibujamos una línea en 250 para ver dónde cae
-abline(v = 300, col = "red", lty = 2)
+abline(v = 125, col = "red", lty = 2)
 
 ###################################
 
@@ -63,7 +63,7 @@ abline(v = 300, col = "red", lty = 2)
 # ==============================================================================
 # Decidimos quedarnos con las mejores N variables.
 # Nos quedamos con 300 variables, que explicarían aproximadamente el 85-90% del dataset
-top_n <- 300 
+top_n <- 125 
 mejores_variables <- as.character(var_imp_df$Variable[1:top_n])
 
 cat("Seleccionadas las", top_n, "variables más importantes.\n")
