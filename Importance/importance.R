@@ -2,8 +2,8 @@ library(randomForest)
 library(caret)
 
 
-train <- read.csv("digit-recognizer/train.csv")
-test <- read.csv("digit-recognizer/test.csv")
+train <- read.csv("~/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/digit-recognizer/train.csv")
+test <- read.csv("~/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/digit-recognizer/test.csv")
 
 
 # ==============================================================================
