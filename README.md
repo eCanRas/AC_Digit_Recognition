@@ -56,14 +56,6 @@ Selecciona píxeles más relevantes. Mantiene interpretabilidad y reduce dimensi
 - **test.csv** - Dataset de prueba original
 - **sample_submission.csv** - Ejemplo de formato de envío
 
-### Subcarpeta `Procesado/Importance/`
-- **train_importance.csv** - Dataset de entrenamiento procesado con selección de variables por importancia
-- **test_importance.csv** - Dataset de prueba procesado con selección de variables
-
-### Subcarpeta `Procesado/PCA/`
-- **train_pca.csv** - Dataset de entrenamiento transformado con PCA
-- **test_pca.csv** - Dataset de prueba transformado con PCA
-
 ### Carpeta `MODELOS/`
 - **rpart_model.R** - Entrenamiento de Árbol de Decisión (rpart) con validación cruzada y podado
 - **rf_model.R** - Entrenamiento de Random Forest con sintonización de hiperparámetros
