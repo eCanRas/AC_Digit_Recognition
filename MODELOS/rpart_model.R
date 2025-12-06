@@ -7,7 +7,6 @@
 # ----------------------------------------------------
 # 1. Carga de Librerías y Carga de Datos
 # ----------------------------------------------------
-# Nota: Asegúrate de tener instalados los paquetes: install.packages(c("data.table", "tidymodels"))
 library(dplyr)
 library(data.table)
 library(tidymodels)
@@ -33,7 +32,7 @@ data <- data %>%
 # 2. Preparación de Datos y División
 # ----------------------------------------------------
 
-# Convertir la columna 'label' a factor (CRUCIAL para clasificación en R)
+# Convertir la columna 'label' a factor
 data$label <- as.factor(data$label)
 
 # División en entrenamiento (80%) y prueba (20%)

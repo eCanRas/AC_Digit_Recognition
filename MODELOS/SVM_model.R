@@ -7,7 +7,6 @@
 # ----------------------------------------------------
 # 1. Carga de Librerías y Carga de Datos
 # ----------------------------------------------------
-# Nota: Asegúrate de tener instalados los paquetes: install.packages(c("data.table", "tidymodels"))
 library(dplyr)
 library(data.table)
 library(tidymodels)
@@ -30,7 +29,7 @@ data <- data %>%
 # 2. Preparación de Datos y División (MODIFICADO para ESCALADO)
 # ----------------------------------------------------
 
-# Convertir la columna 'label' a factor (CRUCIAL para clasificación en R)
+# Convertir la columna 'label' a factor
 data$label <- as.factor(data$label)
 
 # División en entrenamiento (80%) y prueba (20%)
@@ -61,7 +60,7 @@ test_data_scaled <- predict(scaler, test_data)
 
 
 # ----------------------------------------------------
-# 3. Entrenamiento del Modelo (Llamada Directa a SVM)
+# 3. Entrenamiento del Modelo
 # ----------------------------------------------------
 
 message("Iniciando entrenamiento de SVM. Esto será más lento que Random Forest...")
@@ -89,10 +88,10 @@ test_predictions <- predict(
 )
 
 # ------------------------------------>
-# Cálculo de Métricas (usando caret)
+# Cálculo de Métricas
 # ------------------------------------>
 
-# Crear la matriz de confusión (genera todas las estadísticas)
+# Crear la matriz de confusión
 cm <- confusionMatrix(
   data = test_predictions, 
   reference = test_data_scaled$label, # <-- USAR LA ETIQUETA DEL DATO ESCALADO
@@ -100,10 +99,9 @@ cm <- confusionMatrix(
 )
 
 # -------------------------------------------------------------------
-# Extracción de Métricas directamente desde el objeto 'cm' de caret
+# Extracción de Métricas
 # -------------------------------------------------------------------
 
-# Nota: El objeto 'cm' de caret ya contiene las métricas macro/promedio.
 
 model_results <- data.frame(
   Model = "SVM (radial)",
@@ -112,8 +110,6 @@ model_results <- data.frame(
   Accuracy = cm$overall['Accuracy'], 
   
   # Extracción de las métricas promedio por clase (Mean_Precision, Mean_Recall, Mean_F1)
-  # Estas métricas NO siempre están disponibles directamente en cm$byClass
-  # La forma más segura es calcular el promedio de la columna respectiva:
   Precision = mean(cm$byClass[, "Precision"], na.rm = TRUE),
   Recall = mean(cm$byClass[, "Recall"], na.rm = TRUE),
   F1_Score = mean(cm$byClass[, "F1"], na.rm = TRUE)

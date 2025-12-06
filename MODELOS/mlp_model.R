@@ -7,8 +7,6 @@
 # ----------------------------------------------------
 # 1. Carga de Librerías y Carga de Datos
 # ----------------------------------------------------
-# Nota: Asegúrate de tener instalados los paquetes: 
-# install.packages(c("data.table", "tidymodels", "caret", "nnet"))
 library(dplyr)
 library(data.table)
 library(tidymodels) 
@@ -19,7 +17,7 @@ library(nnet) # Paquete que implementa el método 'nnet' (MLP/Red Neuronal)
 # Definir la semilla aleatoria para reproducibilidad
 set.seed(42)
 
-# Cargar el dataset (Asegúrate de que la ruta sea correcta)
+# Cargar el dataset
 #data <- read.csv("C:/Users/USUARIO/Desktop/AC_Digit_Recognition/digit-recognizer/train.csv")
 data <- read.csv("~/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/digit-recognizer/train_pca.csv")
 
@@ -33,7 +31,7 @@ data <- data %>%
 # 2. Preparación de Datos, División y Preprocesamiento
 # ----------------------------------------------------
 
-# Convertir la columna 'label' a factor (CRUCIAL)
+# Convertir la columna 'label' a factor
 data$label <- as.factor(data$label)
 
 # División en entrenamiento (80%) y prueba (20%)
@@ -65,7 +63,6 @@ test_data_processed <- predict(pre_process_params, test_data)
 message("Iniciando ajuste de hiperparámetros para el MLP (Red Neuronal). Esto tomará tiempo...")
 
 # --- Definición de la Búsqueda de Rejilla ---
-# 'size' (número de neuronas en la capa oculta) y 'decay' (regularización de peso)
 mlp_grid <- expand.grid(
   size = c(5, 10),       # Número de neuronas a probar
   decay = c(0.01, 0.1) # Regularización L2 (peso) a probar
