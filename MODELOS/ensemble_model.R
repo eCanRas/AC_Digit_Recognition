@@ -22,7 +22,7 @@ library(kernlab)    # Necesario para el método 'knn'
 set.seed(42)
 
 # Cargar el dataset (Asegúrate de que la ruta sea correcta en tu entorno)
-data <- read.csv("C:/Users/USUARIO/Desktop/AC_Digit_Recognition/digit-recognizer/train.csv")
+data <- read.csv("~/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/digit-recognizer/train_importance.csv")
 
 # Crea subset (Manteniendo el subsampling para agilizar el proceso)
 data <- data %>%
@@ -158,7 +158,7 @@ print(model_results)
 # 5. Guardar Resultados
 # ----------------------------------------------------
 
-results_path <- "C:/Users/USUARIO/Desktop/AC_Digit_Recognition/Resultados/metrics_summary.csv"
+results_path <- "C:/Users/maria/Documents/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/Resultados/importance_metrics_summary.csv"
 
 # Leer, adjuntar y escribir los resultados
 if (file.exists(results_path)) {

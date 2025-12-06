@@ -17,7 +17,8 @@ library(e1071)
 set.seed(42)
 
 # Cargar el dataset
-data <- read.csv("digit-recognizer/train.csv")
+#data <- read.csv("digit-recognizer/train.csv")
+data <- read.csv("~/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/digit-recognizer/train_importance.csv")
 
 # Crea subset
 data <- data %>%
@@ -63,7 +64,7 @@ test_data_scaled <- predict(scaler, test_data)
 # 3. Entrenamiento del Modelo
 # ----------------------------------------------------
 
-message("Iniciando entrenamiento de SVM. Esto será más lento que Random Forest...")
+message("Iniciando entrenamiento de SVM: ")
 
 # Entrena el modelo SVM con la llamada directa (usando los datos ESCALADOS)
 svm_model <- svm(
@@ -122,7 +123,8 @@ print(model_results)
 # 6. Guardar Resultados
 # ----------------------------------------------------
 
-results_path <- "C:/Users/USUARIO/Desktop/AC_Digit_Recognition/Resultados/metrics_summary.csv"
+#results_path <- "C:/Users/USUARIO/Desktop/AC_Digit_Recognition/Resultados/metrics_summary.csv"
+results_path <- "C:/Users/maria/Documents/UNIVERSIDAD/CUARTO CURSO/Aprendizaje computacional/Practicas/Digit recognition/AC_Digit_Recognition/Resultados/importance_metrics_summary.csv"
 
 # Leer, adjuntar y escribir los resultados
 if (file.exists(results_path)) {
